@@ -1,0 +1,134 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 17/07/2015, 05:07:28 PM
+    Author     : srodrigo
+*/
+
+.fill, #contenedor-centro, #archivos { 
+    min-height: 100%;
+    height: 100%;
+}
+.row { background: #EEEEEE; height: 100%; }
+.row > div { height: 100%; padding-top: 60px; }
+.aciTree { height: 400px; border: 0px solid #000; }
+#contenedor-centro{ overflow-y: auto; }
+#contenedor-derecha { background: #FFFFFF; }
+
+#archivos.miniaturas #header-lista { display: none; }
+#archivos.miniaturas .archivo { 
+    width: 200px;
+    height: 230px;
+    float: left;
+    margin: 0px 10px 0px 0px;
+}
+#archivos.miniaturas .archivo img { max-height: 200px; max-width: 190px; }
+#archivos.miniaturas .archivo .icono { height: 200px; }
+#archivos.miniaturas .archivo .propiedades, #contenedor-derecha .filename { display: inline; }
+#archivos.miniaturas .archivo .propiedades .extension { color: #888888; text-transform: uppercase; padding: 0px 5px 0 0; display: inline-block; vertical-align: top; }
+#archivos.miniaturas .archivo .propiedades .nombre {
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 150px;
+    display: inline-block;
+    vertical-align: top;
+}
+#archivos.miniaturas .archivo .tamano,
+#archivos.miniaturas .archivo .tipo,
+#archivos.miniaturas .archivo .ultima_modificacion,
+#archivos.miniaturas .archivo .fecha_subida {
+    display: none;
+}
+
+#archivos.lista #header-lista { display: inline;}
+#archivos.lista { display: inline; }
+#archivos.lista .archivo { display: inline-block; }
+#archivos.lista .archivo .icono { height: 40px; width: 45px;}
+#archivos.lista .archivo > div { display: inline-block; vertical-align: middle;  }
+#archivos.lista .archivo .icono img { max-height: 36px; max-width: 36px; margin-top: 2px; }
+
+#archivos.lista .archivo .propiedades .extension { color: #888888; text-transform: uppercase; padding: 0px 5px 0 0; display: inline-block; vertical-align: middle; }
+#archivos.lista .archivo .propiedades .nombre {
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 300px;
+    display: inline-block;
+    vertical-align: middle;
+}
+#archivos.lista .archivo .tamano { width: 80px; text-align: right; }
+#archivos.lista .archivo .tipo { width: 150px; text-align: right; padding-right: 10px; }
+#archivos.lista .archivo .ultima_modificacion,
+#archivos.lista .archivo .fecha_subida {
+    display: none;
+}
+
+.espaciado { margin: 20px 30px;}
+.table { margin-bottom: 0px; }
+#panel, #fileupload { display: none; }
+div#empty { width: 100%; text-align: center; display: table; }
+div#empty > div { display: table-cell; vertical-align: middle; }
+div#empty h1 { color: lightgray; }
+
+pre.prettyprint {
+    height: 80%;
+}
+
+.multiline-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 3em;
+}
+
+.gray { color: gray; text-transform: uppercase;}
+
+#contenedor-derecha .filename > div {
+    display: inline-block;
+    vertical-align:middle
+}
+
+#archivos.lista #header-lista div { text-align: center; font-weight: bold; color:#000000 !important; }
+
+#archivos.miniaturas .archivo.hover .thumbnail, #archivo_imagen.bordear img {
+    border: 1px solid rgba(92, 21, 77, 1);
+    box-shadow: 0px 0px 5px 2px rgba(92, 21, 77, 1);
+}
+#archivos.miniaturas .archivo.hover{
+    color: #5c154d;
+}
+
+#archivos.lista .archivo.hover:not(#header-lista) {
+    border: 1px solid rgba(92, 21, 77, 1);
+    box-shadow: 0px 0px 5px 2px rgba(92, 21, 77, 1);
+    color: #5c154d;
+}
+
+#archivos.lista .archivo, 
+#archivos.miniaturas .archivo { 
+    cursor: pointer;
+}
+/*************************************** seccion de busqueda ****************************************/
+.ui-autocomplete {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden; /* prevent horizontal scrollbar */
+}
+.ui-autocomplete.ui-menu { z-index: 10000; }
+#srch-term { width: 350px; }
+.ui-autocomplete.ui-menu .item-autocomplete { display: inline-block; width: 100%; }
+.ui-autocomplete.ui-menu .item-autocomplete img { width:64px; display: inline-block; vertical-align:middle; }
+.ui-autocomplete.ui-menu .item-autocomplete .nombre { font-weight: bold; }
+.ui-autocomplete.ui-menu .item-autocomplete .rfcs { font-style: italic; font-size: 12px; }
+.ui-autocomplete.ui-menu .item-autocomplete .empresa { overflow: hidden; text-overflow: ellipsis; font-weight: normal; }
+.ui-autocomplete.ui-menu.ui-widget-content { background: white; }
+.ui-autocomplete.ui-menu.ui-widget-content .ui-state-focus, .ui-widget-content .ui-state-hover { border: 1px solid #5c154d; background: #5c154d; color: #FFFFFF; }
+.ui-autocomplete.ui-menu.ui-widget-content .ui-state-focus img { filter: invert(100%); -webkit-filter: invert(100%) }
+.ui-autocomplete.ui-menu.ui-widget-content .ui-state-focus .item-autocomplete > * { color: #FFFFFF !important; }
+
+/*************************************** seccion de busqueda ****************************************/

@@ -1,0 +1,39 @@
+.archivo {
+/*    float: left;
+    position: relative;*/
+    padding: 5px 5px 0 5px;
+}
+.archivo>.box{
+    display: block;
+}
+
+.archivo .boveda {
+    background: #5c154d;
+    color: #fff;
+    text-align: center;
+}
+
+.archivo .sat {
+    background: #0075bf;
+    color:#fff;
+    text-align: center;
+}
+
+.archivo .box .boveda a, archivo .box .sat a {
+    color: #FFF;
+    text-decoration: none;
+}
+
+.ocultar {
+    visibility: hidden;
+}
+
+.noMostrar {
+    display: none;
+}
+
+.dropdown ul.dropdown-menu {
+    border-radius:4px;
+    box-shadow:none;
+    width:250px;
+}

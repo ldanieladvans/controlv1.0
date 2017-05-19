@@ -1,0 +1,13 @@
+RewriteEngine on
+RewriteCond $1 !^(index\.php|resources|archivos|image|control)
+RewriteRule ^(.*)$ index.php/?$1 [L]
+
+<FilesMatch "^index.php$">
+SetHandler application/x-httpd-php
+AcceptPathInfo On
+</FilesMatch>
+
+php_flag file_uploads On
+php_value post_max_size 50M
+php_value upload_max_filesize 50M
+php_flag short_open_tag On
