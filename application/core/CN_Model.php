@@ -220,5 +220,46 @@ class CN_Model extends CI_Model {
         }       
     }
     
+    function forge_ct($table_name){ 
+        /* Load db_forge - used to create databases and tables */
+        $this->load->dbforge();   
+        /* Specify the table schema */
+        $fields = array(
+            'id' => array(
+                          'type' => 'INT',
+                          'constraint' => 7,
+                          'unsigned' => TRUE,
+                          'auto_increment' => TRUE
+                      ),
+            'active' => array(
+                          'type' => 'BIT',
+                          'constraint' => 1
+                      ),
+            'create_user' => array(
+                          'type' => 'INT',
+                          'constraint' => 7,
+                          'unsigned' => TRUE,
+                      ),
+            'create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+            'write_user' => array(
+                          'type' => 'INT',
+                          'constraint' => 7,
+                          'unsigned' => TRUE,
+                      ),
+            'write_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+        );   
+        /* Add the field before creating the table */
+        $this->dbforge->add_field($fields);
+
+
+        /* Specify the primary key to the 'id' field */
+        $this->dbforge->add_key('id', TRUE);
+
+
+        /* Create the table (if it doesn't already exist) */
+        $this->dbforge->create_table($table_name, TRUE);
+
+      }
+    
 }
 

@@ -22,7 +22,13 @@ class Login extends CI_Controller {
     public function index($data = array()){
         $data['token'] = $this->token();
         $data['titulo'] = $this->lang->line('session_init');
-        $this->load->view('login_view', $data);
+        if(!$this->session->userdata('success_login')){
+            $this->load->view('login_view', $data);
+        }else{
+            $this->session->unset_userdata('success_login');
+            redirect(base_url() . "/".strtolower($this->router->default_controller)."/");
+        }
+        
     }
 
     function iniciar_sesion(){
@@ -41,9 +47,10 @@ class Login extends CI_Controller {
             $numeroCuenta = $this->input->post('rfc');
             $username = $this->input->post('usuario');
             $password = md5($this->input->post('contrasena'));
-            $check_user = $this->Login_model->login_user($username, $password, $numeroCuenta);
+            $check_user = $this->login_user($username, $password, $numeroCuenta);
             if ($check_user == TRUE) {
                 $this->db->set("ultimo_acceso", ahora())->where("id_usuario", $this->session->userdata("id_usuario"))->update("usuarios");
+                $this->session->set_userdata('success_login', TRUE);
                 $this->index();
             }
         }
@@ -69,7 +76,6 @@ class Login extends CI_Controller {
 
     function recuperarContrasena() {
         if ($this->input->post('token') && $this->input->post('token') == $this->session->userdata('token')) {
-            //$this->form_validation->set_rules('correo', 'Correo electrónico', 'required|trim|valid_email|min_length[2]|max_length[150]|xss_clean');
              $this->form_validation->set_rules('numero_cuenta', "Número de cuenta", 'required|trim|xss_clean');
 
             $r['numero_cuenta'] = $this->input->post('numero_cuenta');
@@ -114,27 +120,11 @@ class Login extends CI_Controller {
         }
         $url = base64_decode($base64);
         parse_str($url, $param);
-        /*print_r($param['id_usuario']);
-        die();*/
-        //$r = $this->db->where($param)->limit(1)->get('reset_passwords_time')->row_array();
-
-        /*if ($r->num_rows() == 1) {
-            $data = $r->row_array();
-            $ahora = new DateTime(ahora());
-            $momento = new DateTime($data['time']);
-            $delta = date_diff($ahora, $momento);
-            $seconds = ($delta->s) + ($delta->i * 60) + ($delta->h * 60 * 60) + ($delta->d * 60 * 60 * 24) + ($delta->m * 60 * 60 * 24 * 30) + ($delta->y * 60 * 60 * 24 * 365);*/
-            //if ($seconds < 1800) { // 1800 = 60 segundos * 30 minutos
-                $data['token'] = $this->token();
-                $data['titulo'] = 'Reestablecer contraseña';
-                $data['base64'] = $base64;
-                $data['id_usuario'] = $param['id_usuario'];
-                $this->load->view("reestablecer_contrasena_view", $data);
-            //}
-        //} else {
-          //  $this->session->set_flashdata("informacion", "El TOKEN ha expirado o ha sido usado anteriormente");
-            //redirect(base_url() . "Login");
-        //}
+        $data['token'] = $this->token();
+        $data['titulo'] = 'Reestablecer contraseña';
+        $data['base64'] = $base64;
+        $data['id_usuario'] = $param['id_usuario'];
+        $this->load->view("reestablecer_contrasena_view", $data);
     }
 
     function activarCuenta($base64 = NULL) {
@@ -162,6 +152,99 @@ class Login extends CI_Controller {
             $this->session->set_flashdata("informacion", "Esta llave ha sido usada o ha expirado.");
         }
         redirect(base_url() . "Login");
+    }
+    
+    public function login_user($username, $password, $numeroCuenta) {
+        $result = $this->initSessionDeUsuario($username, $password, $numeroCuenta);
+        if (!$result['success']) {
+            $this->Bitacora_model->insert(array(
+                'id_cuenta' => NULL,
+                'id_empresa' => NULL,
+                'id_usuario' => NULL,
+                'tabla' => NULL,
+                'accion' => "Iniciar sesión",
+                'modulo' => $this->model_name,
+                'data' => json_encode(array("usuario" => $username, "contrasena" => $password)),
+                'result' => json_encode($result),
+                'mensaje' => sprintf("El usuario %s falló al iniciar sesión", $username)
+            ));
+            $this->session->set_flashdata('informacion', $result['message']);
+            redirect(base_url() . 'Login');
+        }
+        $this->session->set_userdata($result['config']);
+        $this->Bitacora_model->insert(array(
+            'tabla' => NULL,
+            'accion' => "Iniciar sesión",
+            'modulo' => $this->model_name,
+            'data' => json_encode(array("usuario" => $username, "contrasena" => $password)),
+            'result' => json_encode($result),
+            'mensaje' => sprintf("El usuario %s inició sesión", $username)
+        ));
+        return TRUE;
+    }
+
+    function cerrar_sesion_bitc() {
+        $this->Bitacora_model->insert(array(
+            'tabla' => NULL,
+            'accion' => "Cerrar sesión",
+            'modulo' => $this->model_name,
+            'data' => NULL,
+            'result' => NULL,
+            'mensaje' => sprintf("El usuario %s finalizó sesión", $this->session->username)
+        ));
+    }
+
+    function resetContrasena($user) {
+        if (!empty($user)) {
+            $idcuenta = $this->db->select("id_cuenta")->like("numero_cuenta",$user)->limit(1)->get("cuentas");
+            if($idcuenta->num_rows() == 1){
+                $idcuentas =$idcuenta->row_array();
+                $id_cuenta = $idcuentas['id_cuenta'];
+            }
+            $r = $this->db->select("id_usuario,username")->like("id_cuenta", $id_cuenta)->limit(1)->get("usuarios");
+            if ($r->num_rows() == 1) {
+                $usuario = $r->row_array();
+                $correo = $usuario['username'];
+                $pass = randomPasswordLetras(40);
+                $idUsuario = $usuario['id_usuario'];
+                $data = array(
+                    'id_usuario' => $usuario['id_usuario'],
+                    'time' => ahora(),
+                    'llave' => $pass
+                );
+                $this->db->insert("reset_passwords_time", $data);
+                $this->load->library("email");
+                $this->email->initialize(array(
+                    'protocol' => 'smtp',
+                    'smtp_host' => 'ssl://smtp.gmail.com',
+                    'smtp_user' => 'app@solucionesadvans.com',
+                    'smtp_pass' => 'soulax69xxx',
+                    'smtp_port' => 465,
+                    'mailtype' => 'html',
+                    'charset' => 'utf-8',
+                    'crlf' => "\r\n",
+                    'newline' => "\r\n"
+                ));
+                $this->email->from("boveda@advans.mx", "Bóveda Soluciones Advans", "soporte@advans.mx");
+                $this->email->to($correo);
+                $this->email->subject("Recuperación de contraseña. Bóveda Soluciones Advans");
+                $hex64 = substr(base64_encode("id_usuario=" . $usuario['id_usuario'] . "&llave=" . $pass), 0, -1);
+                $data = array(
+                    'url_reset_passrword' => base_url() . "Login/reestablecerContrasena/" . $hex64,
+                    'nombre' => $correo
+                );
+                $html = $this->parser->parse("recuperar_contrasena_template", $data, TRUE);
+                $this->email->message($html);
+                if ($this->email->send()) {
+                    return array('success' => TRUE, 'message' => 'Se le ha enviado un correo electrónico.');
+                } else {
+                    return array('success' => FALSE, 'message' => 'No se pudo enviar el correo');
+                }
+            } else {
+                return array('success' => FALSE, 'message' => 'No se encontró ninguna cuenta con ese correo.');
+            }
+        }
+        return array('success' => FALSE, 'message' => 'Faltó escribir el correo electrónico');
     }
 
 }

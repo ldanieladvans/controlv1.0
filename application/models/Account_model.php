@@ -32,6 +32,11 @@ class Account_model extends CN_Model {
         $this->table_name = "cta";
         $this->model_name = "Account_model";
     }
+     
+    function add_fields($fields){ 
+        $this->forge_ct($this->table_name);   
+        $this->dbforge->add_column($this->table_name, $fields);
+      }
     
 }
 
